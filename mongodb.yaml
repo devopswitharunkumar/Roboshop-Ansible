@@ -1,0 +1,26 @@
+- name: mongodb module
+  hosts: mongodb
+  become: yes
+  tasks:
+  - name: copy mongo repo file
+    ansible.builtin.copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+  - name: Install mongodb
+    ansible.builtin.package:
+      name: mongodb-org
+      state: present     #state: latest --> Install the latest version of mongodb-org , present means default version
+  - name: Start and enable mongodb
+    ansible.builtin.service:
+      name: mongod
+      state: started     #state: we have diff options --> started,stopped,restarted,reloaded
+      enabled: yes     
+  - name: Replace remote access
+    ansible.builtin.replace:
+      path: /etc/mongod.conf
+      regexp: '127.0.0.1'  
+      replace: '0.0.0.0'
+  - name: restarte mongodb
+    ansible.builtin.service:
+      name: mongod
+      started: restarted
