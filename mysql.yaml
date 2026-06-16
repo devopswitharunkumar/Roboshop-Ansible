@@ -28,10 +28,22 @@
       state: started
       enabled: yes
 
-  - name: set upuser and password got mysql
+  - name: setup root password
     ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
+    ignore_errors: yes
 
+  - name: allow remote root connection
+    ansible.builtin.command: mysql -uroot -pRoboShop@1 -e "CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'RoboShop@1';"
+    ignore_errors: yes
 
+  - name: grant permissions
+    ansible.builtin.command: mysql -uroot -pRoboShop@1 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION; FLUSH PRIVILEGES;"
+    ignore_errors: yes
+
+  - name: restart mysql
+    ansible.builtin.service:
+      name: mysqld
+      state: restarted
 
 
 # - name: mysql module
