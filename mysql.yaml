@@ -19,7 +19,7 @@
     ansible.builtin.command: yumdownloader mysql-community-server mysql-community-client mysql-community-common mysql-community-libs
 
   - name: install mysql server ignoring digest
-    ansible.builtin.shell: rpm -uvh --nodigest --nofiledigest *.rpm
+    ansible.builtin.shell: rpm -Uvh --nodigest --nofiledigest *.rpm
     ignore_errors: yes
 
   - name: Start and enable mysql
