@@ -11,7 +11,7 @@
       dest: /etc/yum.repos.d/mysql.repo
   
   - name: install mysql community server
-    ansible.builtin.package:
+    ansible.builtin.dnf:
       name: mysql-community-server
       state: present
       disable_gpg_check: true
