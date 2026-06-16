@@ -1,15 +1,53 @@
+# - name: mysql module
+#   hosts: mysql
+#   become: yes
+#   tasks:
+#   - name: disable mysql default version
+#     ansible.builtin.command: dnf module disable mysql -y
+  
+#   - name: copy mysql repo 
+#     ansible.builtin.copy:
+#       src: mysql.repo
+#       dest: /etc/yum.repos.d/mysql.repo
+  
+#   - name: install mysql community server
+#     ansible.builtin.dnf:
+#       name: mysql-community-server
+#       state: present
+#       disable_gpg_check: true
+
+#   - name: Start and enable mysql
+#     ansible.builtin.service:
+#       name: mysqld
+#       state: started
+#       enabled: yes
+
+#   - name: set upuser and password got mysql
+#     ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
+
+
+
+
 - name: mysql module
   hosts: mysql
   become: yes
   tasks:
   - name: disable mysql default version
-    ansible.builtin.command: dnf module disable mysql -y
-  
-  - name: copy mysql repo 
+    ansible.builtin.command:
+      cmd: dnf module disable mysql -y
+
+  - name: enable legacy crypto policy
+    ansible.builtin.command:
+      cmd: update-crypto-policies --set LEGACY
+
+  - name: reboot after crypto change
+    ansible.builtin.reboot:
+
+  - name: copy mysql repo
     ansible.builtin.copy:
       src: mysql.repo
       dest: /etc/yum.repos.d/mysql.repo
-  
+
   - name: install mysql community server
     ansible.builtin.dnf:
       name: mysql-community-server
@@ -22,5 +60,7 @@
       state: started
       enabled: yes
 
-  - name: set upuser and password got mysql
-    ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
+
+  - name: setup mysql password
+    ansible.builtin.command:
+      cmd: mysql_secure_installation --set-root-pass RoboShop@1
