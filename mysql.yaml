@@ -28,42 +28,54 @@
 
 
 
+
 - name: mysql module
   hosts: mysql
   become: yes
+
   tasks:
+
   - name: disable mysql default version
     ansible.builtin.command:
       cmd: dnf module disable mysql -y
 
-  - name: enable legacy crypto policy
-    ansible.builtin.command:
-      cmd: update-crypto-policies --set LEGACY
-
-  - name: reboot after crypto change
-    ansible.builtin.reboot:
 
   - name: copy mysql repo
     ansible.builtin.copy:
       src: mysql.repo
       dest: /etc/yum.repos.d/mysql.repo
 
+
   - name: install yum utils
     ansible.builtin.dnf:
       name: yum-utils
       state: present
 
-  - name: remove old rpm files
+
+  - name: check mysql already installed or not
+    ansible.builtin.command:
+      cmd: rpm -q mysql-community-server
+    register: mysql_check
+    ignore_errors: true
+
+
+  - name: remove old downloaded rpm files
     ansible.builtin.shell:
       cmd: rm -f *.rpm
+    when: mysql_check.rc != 0
+
 
   - name: download mysql packages
     ansible.builtin.command:
       cmd: dnf download mysql-community-server.x86_64 --resolve --arch=x86_64
+    when: mysql_check.rc != 0
+
 
   - name: install mysql community server ignoring digest
     ansible.builtin.shell:
       cmd: rpm -ivh --nodigest --nofiledigest *.rpm
+    when: mysql_check.rc != 0
+
 
   - name: Start and enable mysql
     ansible.builtin.service:
@@ -71,6 +83,23 @@
       state: started
       enabled: yes
 
-  - name: setup mysql password
+
+  - name: set root password for mysql
     ansible.builtin.command:
       cmd: mysql_secure_installation --set-root-pass RoboShop@1
+    ignore_errors: true
+
+
+  - name: create remote root user
+    ansible.builtin.command:
+      cmd: mysql -uroot -pRoboShop@1 -e "CREATE USER IF NOT EXISTS 'root'@'%' IDENTIFIED BY 'RoboShop@1';"
+
+
+  - name: grant remote permissions
+    ansible.builtin.command:
+      cmd: mysql -uroot -pRoboShop@1 -e "GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;"
+
+
+  - name: reload mysql privileges
+    ansible.builtin.command:
+      cmd: mysql -uroot -pRoboShop@1 -e "FLUSH PRIVILEGES;"
