@@ -67,7 +67,8 @@
       state: present
       
   - name: check catalogue product count
-    ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db = db.getSiblingDb("catalogue"); db.products.count()'
+    # ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db = db.getSiblingDb("catalogue"); db.products.count()'
+    ansible.builtin.command: mongo --host mongodb.devopswitharun.online/catalogue --quiet --eval 'db.products.count()'
     register: product_count
 
   - name: print the count
@@ -75,7 +76,7 @@
       msg: "product_count is {{product_count}}"
 
   - name: load the catalogue data
-    ansible.builtin.command: mongo --host mongodb.devopswitharun.online < /app/schema/catalogue.js
+    ansible.builtin.shell: mongo --host mongodb.devopswitharun.online < /app/schema/catalogue.js
     when: product_count.stdout == "0"
   
   - name: restart and enable
