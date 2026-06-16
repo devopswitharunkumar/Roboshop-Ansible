@@ -48,11 +48,9 @@
       src: mysql.repo
       dest: /etc/yum.repos.d/mysql.repo
 
-  - name: install mysql community server
-    ansible.builtin.dnf:
-      name: mysql-community-server
-      state: present
-      disable_gpg_check: true
+- name: install mysql community server
+  ansible.builtin.command:
+    cmd: dnf install mysql-community-server -y --nogpgcheck --setopt=tsflags=nodocs --rpmverbosity=debug
 
   - name: Start and enable mysql
     ansible.builtin.service:
