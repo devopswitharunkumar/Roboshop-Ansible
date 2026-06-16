@@ -84,10 +84,17 @@
       enabled: yes
 
 
-  - name: set root password for mysql
+  - name: check mysql password already setup
+    ansible.builtin.command:
+      cmd: mysql -uroot -pRoboShop@1 -e "show databases;"
+    register: mysql_login
+    ignore_errors: true
+
+
+  - name: set root password
     ansible.builtin.command:
       cmd: mysql_secure_installation --set-root-pass RoboShop@1
-    ignore_errors: true
+    when: mysql_login.rc != 0
 
 
   - name: create remote root user
