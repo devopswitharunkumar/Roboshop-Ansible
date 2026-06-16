@@ -3,17 +3,22 @@
   become: yes
   tasks:
   - name: Disable default version
-    ansible.builtin.command: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
+    ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
 
   - name: install nodejs 18
     ansible.builtin.package:
       name: nodejs
       state: present
 
-  - name: create user
+  - name: create roboshop user
     ansible.builtin.user:
       name: roboshop
       #state: absent  --> state: present not required automatically done but if we want to remove absent and remove: yes
+
+  - name: create app directory
+    ansible.builtin.file:
+      path: /app
+      state: absent
 
   - name: create app directory
     ansible.builtin.file:
@@ -44,12 +49,6 @@
   - name: Daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true
-  - name: Daemon reload
-
-    ansible.builtin.service:
-      name: user
-      state: started 
-      enabled: yes
 
   - name: Copy mongo repo file
     ansible.builtin.copy:
@@ -61,17 +60,17 @@
       name: mongodb-org-shell
       state: present
       
-  - name: check user product count
+  - name: check user count
     ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db.getSiblingDb("user"); db.products.count()'
-    register: product_count
+    register: user_count
 
   - name: print the count
     ansible.builtin.debug:
-      msg: "product_count is {{product_count}}"
+      msg: "user_count is {{user_count}}"
 
   - name: load the user data
     ansible.builtin.command: mongo --host mongodb.devopswitharun.online < /app/schema/user.js
-    when: product_count.stdout == "0"
+    when: user_count.stdout == "0"
   
   - name: restart and enable
     ansible.builtin.service:

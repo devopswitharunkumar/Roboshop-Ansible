@@ -10,10 +10,15 @@
       name: nodejs
       state: present
 
-  - name: create user
+  - name: create roboshop user
     ansible.builtin.user:
       name: roboshop
       #state: absent  --> state: present not required automatically done but if we want to remove absent and remove: yes
+
+  - name: recursively remove app directory if present
+    ansible.builtin.file:
+      path: /app
+      state: absent
 
   - name: create app directory
     ansible.builtin.file:
@@ -44,8 +49,8 @@
   - name: Daemon reload
     ansible.builtin.systemd_service:
       daemon_reload: true
-  - name: Daemon reload
 
+  - name: start and enable cart
     ansible.builtin.service:
       name: cart
       state: started 
