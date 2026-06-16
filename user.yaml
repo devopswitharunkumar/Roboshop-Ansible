@@ -61,7 +61,7 @@
       state: present
       
   - name: check user count
-    ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db.getSiblingDb("users"); db.users.count()'
+    ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db.getSiblingDB("users"); db.users.count()'
     register: user_count
 
   - name: print the count
@@ -69,7 +69,7 @@
       msg: "user_count is {{user_count}}"
 
   - name: load the user data
-    ansible.builtin.command: mongo --host mongodb.devopswitharun.online < /app/schema/user.js
+    ansible.builtin.shell: mongo --host mongodb.devopswitharun.online < /app/schema/user.js
     when: user_count.stdout == "0"
   
   - name: restart and enable
