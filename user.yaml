@@ -2,11 +2,11 @@
   hosts: user
   become: yes
   tasks:
-  - name: Disable default version
+  - name: Disable default version and enable nodejs
     ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
 
   - name: install nodejs 18
-    ansible.builtin.package:
+    ansible.builtin.dnf:
       name: nodejs
       state: present
 
@@ -15,7 +15,7 @@
       name: roboshop
       #state: absent  --> state: present not required automatically done but if we want to remove absent and remove: yes
 
-  - name: create app directory
+  - name: recursively remove app directory
     ansible.builtin.file:
       path: /app
       state: absent
