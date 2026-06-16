@@ -5,16 +5,22 @@
   - name: disable mysql default version
     ansible.builtin.command: dnf module disable mysql -y
   
-  - name: copy mysql repo 
+  - name: setup mysql5.7 repo
     ansible.builtin.copy:
       src: mysql.repo
       dest: /etc/yum.repos.d/mysql.repo
   
-  - name: install mysql community server
-    ansible.builtin.dnf:
-      name: mysql-community-server
+  - name: install yum utils
+    ansible.builtin.package:
+      name: yum-utils
       state: present
-      disable_gpg_check: true
+
+  - name: download mysql rpms
+    ansible.builtin.command: yumdownloader mysql-community-server mysql-community-client mysql-community-common mysql-community-libs
+
+  - name: install mysql server ignoring digest
+    ansible.builtin.shell: rpm -uvh --nodigest --nofiledigest *.rpm
+    ignore_errors: yes
 
   - name: Start and enable mysql
     ansible.builtin.service:
