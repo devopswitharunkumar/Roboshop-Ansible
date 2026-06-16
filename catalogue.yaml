@@ -50,12 +50,6 @@
     ansible.builtin.systemd_service:
       daemon_reload: true
 
-  - name: start and enable catalogue
-    ansible.builtin.service:
-      name: catalogue
-      state: started 
-      enabled: yes
-
   - name: Copy mongo repo file
     ansible.builtin.copy:
       src: mongo.repo
@@ -68,7 +62,6 @@
       
   - name: check catalogue product count
     ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db = db.getSiblingDB("catalogue"); db.products.count()'
-
     register: product_count
 
   - name: print the count
