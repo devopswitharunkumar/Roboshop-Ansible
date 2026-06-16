@@ -75,7 +75,7 @@
   - name: loading cities details
     ansible.builtin.shell: "mysql -h mysql.devopswitharun.online -u root -p{{mysql_password}} < /app/schema/shipping.sql"     
     when: schema.stdout != "1"
-#here we used shell because we have redirections < with command modue it will not work
+# here we used shell because we have redirections < with command modue it will not work
   - name: start and enable shipping
     ansible.builtin.service:
       name: shipping
