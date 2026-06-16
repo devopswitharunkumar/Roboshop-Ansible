@@ -53,11 +53,13 @@
       name: yum-utils
       state: present
 
+  - name: remove old rpm files
+    ansible.builtin.shell:
+      cmd: rm -f *.rpm
 
   - name: download mysql packages
     ansible.builtin.command:
-      cmd: dnf download mysql-community-server --resolve
-
+      cmd: dnf download mysql-community-server.x86_64 --resolve --arch=x86_64
 
   - name: install mysql community server ignoring digest
     ansible.builtin.shell:
