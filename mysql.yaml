@@ -48,10 +48,20 @@
       src: mysql.repo
       dest: /etc/yum.repos.d/mysql.repo
 
-  - name: install mysql community server
-    ansible.builtin.shell: |
-      dnf download mysql-community-server mysql-community-client mysql-community-common mysql-community-libs -y
-      rpm -ivh --nodigest --nofiledigest mysql-community*.rpm
+  - name: install yum utils
+    ansible.builtin.dnf:
+      name: yum-utils
+      state: present
+
+
+  - name: download mysql packages
+    ansible.builtin.command:
+      cmd: dnf download mysql-community-server --resolve
+
+
+  - name: install mysql community server ignoring digest
+    ansible.builtin.shell:
+      cmd: rpm -ivh --nodigest --nofiledigest *.rpm
 
   - name: Start and enable mysql
     ansible.builtin.service:
