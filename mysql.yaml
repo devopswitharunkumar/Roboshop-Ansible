@@ -49,8 +49,9 @@
       dest: /etc/yum.repos.d/mysql.repo
 
   - name: install mysql community server
-    ansible.builtin.command:
-      cmd: dnf install mysql-community-server -y --nogpgcheck --setopt=tsflags=nodocs --rpmverbosity=debug
+    ansible.builtin.shell: |
+      dnf download mysql-community-server mysql-community-client mysql-community-common mysql-community-libs -y
+      rpm -ivh --nodigest --nofiledigest mysql-community*.rpm
 
   - name: Start and enable mysql
     ansible.builtin.service:
