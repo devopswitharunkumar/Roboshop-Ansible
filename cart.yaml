@@ -2,11 +2,11 @@
   hosts: cart
   become: yes
   tasks:
-  - name: Disable default version
+  - name: Disable default version and enable nodejs
     ansible.builtin.shell: dnf module disable nodejs -y ; dnf module enable nodejs:18 -y
 
   - name: install nodejs 18
-    ansible.builtin.package:
+    ansible.builtin.dnf:
       name: nodejs
       state: present
 
