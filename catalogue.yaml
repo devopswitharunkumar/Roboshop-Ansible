@@ -67,7 +67,7 @@
       state: present
       
   - name: check catalogue product count
-    ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db.getSiblingDb("catalogue"); db.products.count()'
+    ansible.builtin.command: mongo --host mongodb.devopswitharun.online --quiet --eval 'db = db.getSiblingDb("catalogue"); db.products.count()'
     register: product_count
 
   - name: print the count
