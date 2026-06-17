@@ -35,8 +35,12 @@
       state: started
       enabled: yes
 
-  - name: setup root password
-    ansible.builtin.command: mysql_secure_installation --set-root-pass RoboShop@1
+  - name: get mysql temporary password
+    ansible.builtin.shell: grep 'temporary password' /var/log/mysqld.log | awk '{print $NF}'
+    register: mysql_temp_password
+
+  - name: setup mysql root password
+    ansible.builtin.shell: mysql --connect-expired-password -uroot -p'{{mysql_temp_password.stdout}}' -e "ALTER USER 'root'@'localhost' IDENTIFIED BY 'RoboShop@1';"
     ignore_errors: yes
 
   - name: allow remote root connection
