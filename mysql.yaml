@@ -14,12 +14,17 @@
     ansible.builtin.package:
       name: yum-utils
       state: present
-      
+
   - name: remove old downloaded rpm files
     ansible.builtin.shell: rm -f *.rpm
 
   - name: download mysql x86_64 rpms only
     ansible.builtin.command: yumdownloader --archlist=x86_64 mysql-community-server mysql-community-client mysql-community-common mysql-community-libs
+  
+  - name: install ncurses compatibility libs
+    ansible.builtin.dnf:
+      name: ncurses-compat-libs
+      state: present
 
   - name: install mysql server ignoring digest
     ansible.builtin.shell: rpm -Uvh --nodigest --nofiledigest *.x86_64.rpm
