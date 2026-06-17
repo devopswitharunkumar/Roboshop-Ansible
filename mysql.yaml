@@ -28,6 +28,10 @@
 
   - name: install mysql server ignoring digest
     ansible.builtin.shell: rpm -Uvh --nodigest --nofiledigest *.x86_64.rpm
+    register: mysql_install
+    failed_when: 
+      - mysql_install.rc != 0
+      - "'already installed' not in mysql_install.stderr"
 
   - name: Start and enable mysql
     ansible.builtin.service:
